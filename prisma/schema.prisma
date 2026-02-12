@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
@@ -15,15 +15,17 @@ datasource db {
 
 model User {
   id          String     @id @default(cuid())
-  clearkUserId String     @unique
+  clerkUserId String     @unique
   email       String     @unique
+  name        String
   imageUrl    String?
+  role        String?
+  articles    Articles[]
   comments    Comment[]
-  likes       Like[]
-  articles    Article[]
+  likes       Like[] // A user can like multiple articles
 }
 
-model Article {
+model Articles {
   id            String    @id @default(cuid())
   title         String
   content       String
@@ -32,27 +34,28 @@ model Article {
   author        User      @relation(fields: [authorId], references: [id])
   authorId      String
   comments      Comment[]
-  likes         Like[]
+  likes         Like[] // An article can have multiple likes
   createdAt     DateTime  @default(now())
 }
 
 model Comment {
   id        String   @id @default(cuid())
   body      String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  article   Article @relation(fields: [articleId], references: [id])
   articleId String
+  article   Articles @relation(fields: [articleId], references: [id])
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Like {
-  id String @id @default(cuid())
-
+  id        String   @id @default(cuid())
+  isLiked   Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id])
   userId    String
-  articles  Article @relation(fields: [articleId], references: [id])
+  article   Articles @relation(fields: [articleId], references: [id])
   articleId String
   createdAt DateTime @default(now())
 
-  @@unique([userId, articleId]) //one user can like only once
+  @@unique([userId, articleId]) // Ensures a user can like an article only once
 }

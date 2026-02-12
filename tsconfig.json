@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "components/articles/article-search-input.tss", "prisma/seed.ts"  ],
   "exclude": ["node_modules"]
 }
